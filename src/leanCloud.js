@@ -12,7 +12,7 @@ export default AV
 // 所有跟 Todo 相关的 LeanCloud 操作都放到这里
 export const TodoModel = {
   getByUser(user, successFn, errorFn){
-    // 文档见 https://leancloud.cn/docs/leanstorage_guide-js.html#批量操作
+    // 文档见 https://leancloud.cn/docs/leanstorage_guide-js.html
     let query = new AV.Query('Todo')
     query.equalTo('deleted', false);
     query.find().then((response) => {
@@ -25,7 +25,7 @@ export const TodoModel = {
     })
   },
   create({status, title, deleted}, successFn, errorFn){
-    let Todo = AV.Object.extend('Todo') // 记得把多余的分号删掉，我讨厌分号
+    let Todo = AV.Object.extend('Todo') 
     let todo = new Todo()
     todo.set('title', title)
     todo.set('status', status)
@@ -34,7 +34,7 @@ export const TodoModel = {
     // 根据文档 https://leancloud.cn/docs/acl-guide.html#单用户权限设置
     // 这样做就可以让这个 Todo 只被当前用户看到
     let acl = new AV.ACL()
-    acl.setPublicReadAccess(false) // 注意这里是 false
+    acl.setPublicReadAccess(false) 
     acl.setWriteAccess(AV.User.current(), true)
     acl.setReadAccess(AV.User.current(), true)
 
@@ -54,15 +54,7 @@ export const TodoModel = {
     status !== undefined && todo.set('status', status)
     deleted !== undefined && todo.set('deleted', deleted)
    
-    // 考虑如下场景
-    // update({id:1, title:'hi'})
-    // 调用 update 时，很有可能没有传 status 和 deleted
-    // 也就是说，用户只想「局部更新」
-    // 所以我们只 set 该 set 的
-    // 那么为什么不写成 title && todo.set('title', title) 呢，为什么要多此一举跟 undefined 做对比呢？
-    // 考虑如下场景
-    // update({id:1, title: '', status: null}}
-    // 用户想将 title 和 status 置空，我们要满足
+    
     todo.save().then((response) => {
       successFn && successFn.call(null)
     }, (error) => errorFn && errorFn.call(null, error))
